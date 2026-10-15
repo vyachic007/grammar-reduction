@@ -14,7 +14,7 @@ public class Main {
 
         for (String s : terminalInput) {
             if (!s.isEmpty()) {
-                terminals.add(s.charAt(0));
+                terminals.add(s.charAt(0)); //добавляем терминал
             }
         }
 
@@ -58,7 +58,6 @@ public class Main {
         printRules(rules);
 
         // 1. УДАЛЕНИЕ БЕСПЛОДНЫХ СИМВОЛОВ
-
         System.out.println("\n1. Удаление бесплодных символов");
 
         Set<Character> good = new LinkedHashSet<>();
@@ -67,20 +66,20 @@ public class Main {
 
         int step = 1;
 
-        while (true) {
+        while (true) { //повторяем до стабилизации
 
             Set<Character> newGood = new LinkedHashSet<>(good);
 
-            for (char left : nonTerminals) {
+            for (char left : nonTerminals) { //перебираем все нетерминалы
 
                 List<String> rightParts = rules.get(left);
 
-                if (rightParts == null) {
+                if (rightParts == null) { //правила нет - пропускаем
                     continue;
                 }
 
-                for (String right : rightParts) {
-
+                for (String right : rightParts) { //перебор альтернатив правой части
+                    //если хотя бы одна альтернатива порождает цепочку т-в
                     if (canGenerate(right, terminals, good)) {
                         newGood.add(left);
                         break;
@@ -90,7 +89,7 @@ public class Main {
 
             System.out.println("Y" + step + " = " + newGood);
 
-            if (newGood.equals(good)) {
+            if (newGood.equals(good)) { //если множ-во не изменилось
                 break;
             }
 
@@ -100,7 +99,7 @@ public class Main {
 
         // Находим бесплодные нетерминалы
         Set<Character> fruitless = new LinkedHashSet<>(nonTerminals);
-        fruitless.removeAll(good);
+        fruitless.removeAll(good); //удаляем все хорошие из множ-ва
 
         System.out.println("\nБесплодные символы: " + fruitless);
 
@@ -109,19 +108,19 @@ public class Main {
 
         for (char left : nonTerminals) {
 
-            if (!good.contains(left)) {
+            if (!good.contains(left)) { //нет левой части - бесплодна
                 continue;
             }
 
-            List<String> rightParts = rules.get(left);
+            List<String> rightParts = rules.get(left); //берем правила нетерминала
 
-            if (rightParts == null) {
+            if (rightParts == null) { // правил нет - пропускаем
                 continue;
             }
 
             List<String> newRules = new ArrayList<>();
 
-            for (String right : rightParts) {
+            for (String right : rightParts) { // переб-м все альтернативы
 
                 boolean allowed = true;
 
@@ -133,7 +132,7 @@ public class Main {
                     }
                 }
 
-                if (allowed) {
+                if (allowed) { // проверка прошла - правило чистое
                     newRules.add(right);
                 }
             }
@@ -146,12 +145,13 @@ public class Main {
         System.out.println("\nГрамматика после удаления бесплодных:");
         printRules(afterFruitless);
 
-        // 2. УДАЛЕНИЕ НЕДОСТИЖИМЫХ СИМВОЛОВ
 
+
+        // 2. УДАЛЕНИЕ НЕДОСТИЖИМЫХ СИМВОЛОВ
         System.out.println("\n2. Удаление недостижимых символов");
 
         Set<Character> reachable = new LinkedHashSet<>();
-        reachable.add(start);
+        reachable.add(start); // S
 
         System.out.println("V0 = " + reachable);
 
@@ -161,18 +161,18 @@ public class Main {
 
             Set<Character> newReachable = new LinkedHashSet<>(reachable);
 
-            for (char left : afterFruitless.keySet()) {
+            for (char left : afterFruitless.keySet()) { // перебор нетерминалов
 
-                if (!reachable.contains(left)) {
+                if (!reachable.contains(left)) { //пропуск еще не достигнутых
                     continue;
                 }
 
-                for (String right : afterFruitless.get(left)) {
+                for (String right : afterFruitless.get(left)) { //перебираем правила текущего нет-ла
 
                     for (char c : right.toCharArray()) {
 
                         if (terminals.contains(c)
-                                || afterFruitless.containsKey(c)) {
+                                || afterFruitless.containsKey(c)) { //существует ли в грамматике
 
                             newReachable.add(c);
                         }
@@ -209,15 +209,15 @@ public class Main {
         // Формируем итоговую грамматику
         Map<Character, List<String>> result = new LinkedHashMap<>();
 
-        for (char left : afterFruitless.keySet()) {
+        for (char left : afterFruitless.keySet()) { //нетер-лы
 
-            if (!reachable.contains(left)) {
+            if (!reachable.contains(left)) { //пропуск недост-х
                 continue;
             }
 
             List<String> newRules = new ArrayList<>();
 
-            for (String right : afterFruitless.get(left)) {
+            for (String right : afterFruitless.get(left)) { //перебор альтернатив
 
                 boolean allowed = true;
 
